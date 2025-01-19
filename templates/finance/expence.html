@@ -64,18 +64,18 @@
                                 <td>
                                     {{m.date}}</td>
                                 <!-- <td>{{m.code}}</td> -->
-                                <td>{{m.perticulers}}</td>
+                                <td>{{m.particulars}}</td>
                                 <td>{{m.amount}}</td>
 
                                 <td>
                                     <div class="d-flex align-items-center list-action">
 
-                                        <a class="badge bg-success mr-2" data-toggle="tooltip" data-placement="top"
+                                        <a class="btn btn-sm btn-primary mr-2" data-toggle="tooltip" data-placement="top"
                                             title="" data-original-title="Edit" href="{%url 'update_expense' m.id %}"><i
-                                                class="ri-pencil-line mr-0"></i></a>
-                                        <a class="badge bg-warning mr-2" data-toggle="modal"
+                                            class="bi bi-pencil-square mr-0"></i></a>
+                                        <a class="btn btn-danger btn-sm mr-2" data-toggle="modal"
                                             data-target="#deletemodel{{m.id}}" data-original-title="Delete" href="#"><i
-                                                class="ri-delete-bin-line mr-0"></i></a>
+                                            class="bi bi-trash3-fill mr-0"></i></a>
                                         <!-- Delete Modal -->
                                         <div class="modal fade" id="deletemodel{{m.id}}" tabindex="-1" role="dialog"
                                             aria-labelledby="exampleModalLabel" aria-hidden="true">

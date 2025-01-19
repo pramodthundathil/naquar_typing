@@ -142,6 +142,7 @@ def create_booking(request, pk):
 def add_order_item(request,pk):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
+        client_form = OrderItemClientForm()
         print(product_id,")))))))))))))))))))))))))))))))))))))))))))")
         try:
             order = Order.objects.get(id=pk)
@@ -154,7 +155,7 @@ def add_order_item(request,pk):
             # order.update_totals()
             
             # Render the order items table
-            order_items_html = render_to_string('ajax/order_items_table.html', {'order': order})
+            order_items_html = render_to_string('ajax/order_items_table.html', {'order': order,"client_form":client_form})
             return JsonResponse({"success": True, "html": order_items_html})
         except Order.DoesNotExist:
             return JsonResponse({"success": False, "error": "Order not found"})
@@ -242,6 +243,36 @@ def add_discount(request, pk):
         order.update_totals()
         messages.info(request,"discount added...")
         return redirect(create_booking, pk = pk)
+    
+
+@login_required(login_url='signin')
+def add_payment(request, pk):
+    order = Order.objects.get(id = pk)
+    if request.method == "POST":
+        try:
+            amount = float(request.POST.get("amount"))
+            payment_mode = request.POST.get("mode_payment")
+            order.paid_amount += amount
+            order.save()
+            if amount > 0:
+                expense = Income(
+                        particulars = f"Amount Against order {order.invoice_number}",
+                        amount =  amount,
+                        bill_number = order.invoice_number,
+                        payment_mode = payment_mode,
+                        other = order.customer.name if order.customer else 'Cash Customer'
+                    )
+                
+                expense.save()  
+            messages.success(request,"Payment Added.....")
+            return redirect(create_booking, pk = pk)
+        except:
+            messages.success(request,"Something Wrong.....")
+            return redirect(create_booking, pk = pk)
+
+    
+    return redirect(create_booking, pk = pk)
+
 
 
 
@@ -259,6 +290,7 @@ def amount_in_words(amount):
     
     # Combine with custom currency terms
     return f"{whole_part_words.capitalize()} Dirhams and {decimal_part_words.capitalize()} Fils Only"
+
 def invoice(request,pk):
     order = Order.objects.get(id = pk)
 
@@ -267,6 +299,44 @@ def invoice(request,pk):
         "total_in_words": amount_in_words(round(order.total_amount_from_customer,2))
     }
     return render(request, 'invoice_template.html',context )
+
+
+import qrcode
+import io
+from django.http import HttpResponse
+from django.core.files.base import ContentFile
+import base64
+from django.shortcuts import render, get_object_or_404
+from .models import Order
+
+def voucher(request, pk):
+    order = get_object_or_404(Order, id=pk)
+    
+    # Generate the QR code URL
+    qr_url = request.build_absolute_uri(f"/create_booking/{order.id}/")
+
+    # Generate the QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_url)
+    qr.make(fit=True)
+
+    # Convert QR code to an image
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    qr_image = base64.b64encode(buffer.getvalue()).decode()
+
+    context = {
+        "order": order,
+        "total_in_words": amount_in_words(round(order.total_amount_from_customer, 2)),
+        "qr_image": qr_image,  # Pass the QR code image
+    }
+    return render(request, 'invoice_voucher.html', context)
 
 
  
@@ -289,6 +359,7 @@ def add_customer(request,pk):
 from django.db import IntegrityError
 
 @login_required(login_url='signin')
+@csrf_exempt
 def add_client_to_service(request,pk):
     order_item = get_object_or_404(OrderItem,pk = pk)
     form = OrderItemClientForm()
@@ -311,6 +382,9 @@ def add_client_to_service(request,pk):
                 return redirect(create_booking, pk=order_item.order.id)
         else:
             messages.error(request, "Form is invalid. Please correct the errors.")
+            return redirect(create_booking, pk=order_item.order.id)
+
+
     
 @login_required(login_url='signin')
 def add_client_form_edit_tab(request, pk):

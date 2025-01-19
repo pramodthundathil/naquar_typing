@@ -4,7 +4,7 @@ from .models import Income, Expense
 class IncomeForm(forms.ModelForm):
     class Meta:
         model = Income
-        fields = ['particulars', 'amount', "bill_number", 'other']
+        fields = ['particulars', 'amount', "bill_number","payment_mode", 'other']
         labels = {
             'particulars': 'Particulars',
             'amount': 'Amount',
@@ -32,12 +32,17 @@ class IncomeForm(forms.ModelForm):
                 'id': 'billno',
                 'placeholder': 'Bill Number (Optional)'
             }),
+            "payment_mode": forms.Select(attrs={
+                'class': 'form-control',
+                'id': 'payment_mode',
+                'placeholder': 'Payment Mode'
+            })
         }
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ['particulars',"bill_number", 'amount', 'other']
+        fields = ['particulars',"bill_number","payment_mode", 'amount', 'other']
         labels = {
             'particulars': 'Particulars',
             'amount': 'Amount',
@@ -66,4 +71,9 @@ class ExpenseForm(forms.ModelForm):
                 'id': 'billno',
                 'placeholder': 'Bill Number (Optional)'
             }),
+            "payment_mode": forms.Select(attrs={
+                'class': 'form-control',
+                'id': 'payment_mode',
+                'placeholder': 'Payment Mode'
+            })
         }

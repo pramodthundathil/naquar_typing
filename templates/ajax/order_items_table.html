@@ -1,4 +1,22 @@
 {% load static %}
+
+{% for message in messages %}
+
+<div class="toast-container position-fixed p-3 " style="right: 0; top:70px;z-index: 2;margin: auto;">
+    <div id="toast-{{ forloop.counter }}" class="toast {{ message.tags }}" role="alert" aria-live="assertive"
+        aria-atomic="true" style="opacity: 1 !important;width:300px !important ;">
+        <!-- <div class="toast-header">
+<img src="{%static 'images\tick.png' %}" style="width:20px" class="rounded me-2" alt="...">
+<strong class="me-auto"></strong>
+<small></small>
+<button type="button" class="btn-close btn" data-bs-dismiss="toast" aria-label="Close">x</button>
+</div> -->
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+</div>
+{% endfor %}
 <table class="table table-striped mt-3" style="width: 100% !important;">
     <tr class="head-tr-class">
         <th>Service</th>
@@ -95,7 +113,15 @@
 </table>
 
 <div class="card">
-
+    {% if request.user.role == "user" %}
+    <div class="card-header d-flex justify-content-between">
+        <div class="row">
+            <div class="col-md-12 mt-3 text-center">
+                <a href="{%url 'voucher' order.id %}" target="_blank" class="btn btn-primary">Print Voucher</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
     <div class="card-header d-flex justify-content-between">
         <div class="header-title">
             <!-- <form id="payment" action=""> -->
@@ -110,6 +136,8 @@
                     <br>
                     <input type="number" class="form-control" id="amount-paid"
                         value="{{order.paid_amount |floatformat:2}}" name="amount_paid">
+
+
 
                 </div>
                 <div class="col-md-3">
@@ -133,11 +161,11 @@
                 <div class="col-md-12">
                     <h3 id="payment-status">{{order.payment_status1}}</h3>
                 </div>
-                <div class="col-md-4 mt-3">
+                <div class="col-md-3 mt-3">
                     <a href="{%url 'invoice' order.id %}" target="_blank" class="btn btn-primary">Print
                         Invoice</a>
                 </div>
-                <div class="col-md-4 mt-3">
+                <div class="col-md-3 mt-3">
                     <a data-bs-toggle="modal" data-bs-target="#exampleModal{{order.id}}"
                         class="btn btn-secondary">Save</a>
 
@@ -166,30 +194,59 @@
 
 
                 </div>
-                <!-- <div class="col-md-4 mt-3">
-                        <a href="" class="btn btn-info">Discount</a>
-                    </div> -->
-            </div>
-            <!-- </form> -->
-            <div class="modal fade" id="bill_discount" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Add Bill Discount</h5>
-                            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button> -->
-                        </div>
-                        <div class="modal-body">
-                            <form action="{%url 'add_discount' order.id %}" method="post">
-                                {% csrf_token %}
-                                <input type="number" name="discount" required class="form-control"
-                                    placeholder="discount"><br>
-                                <button type="submit" class="btn btn-info">Save</button>
-                            </form>
-                        </div>
+                <div class="col-md-3 mt-3">
+                    <a data-bs-toggle="modal" data-bs-target="#paymentmode" class="btn btn-info">Add Payment</a>
+                </div>
+                <div class="col-md-3 mt-3">
+                    <a data-bs-toggle="modal" data-bs-target="#bill_discount" class="btn btn-warning">Add Discount</a>
+                </div>
 
+                <div class="modal fade" id="bill_discount" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Bill Discount</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{% url 'add_discount' order.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="number" name="discount" required class="form-control"
+                                        placeholder="discount"><br>
+                                    <button type="submit" class="btn btn-info">Save</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="modal fade" id="paymentmode" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Payment</h5>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{% url 'add_payment' order.id %}" method="post">
+                                    {% csrf_token %}
+                                    <label for="">Amount</label>
+                                    <input type="number" name="amount" required class="form-control"
+                                        placeholder="Amount"><br>
+                                    <label for="">Payment Mode</label>
+                                    <select name="mode_payment" id="id_payment_mode" class="form-control">
+                                        <option value="Cash">Cash</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Debit Card">Debit Card</option>
+                                        <option value="Net Banking">Net Banking</option>
+                                        <option value="UPI">UPI</option>
+                                        <option value="Cheque">Cheque</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+
+                                    <br>
+                                    <button type="submit" class="btn btn-info">Save</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -198,7 +255,7 @@
 
     </div>
 
-
+    {% endif %}
 
 
 </div>

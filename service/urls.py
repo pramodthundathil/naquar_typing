@@ -16,6 +16,7 @@ urlpatterns = [
     path('add_order_item/<int:pk>', views.add_order_item, name='add_order_item'),
     path('delete_order_item/', views.delete_order_item, name='delete_order_item'),
     path("invoice/<int:pk>",views.invoice,name="invoice"),
+    path("voucher/<int:pk>",views.voucher,name="voucher"),
     path("add_customer/<int:pk>",views.add_customer,name="add_customer"),
     path("add_client_to_service/<int:pk>",views.add_client_to_service,name="add_client_to_service"),
     path("edit_order_booking/<int:pk>",views.edit_order_booking,name="edit_order_booking"),
@@ -24,6 +25,7 @@ urlpatterns = [
 
     path("update_order_payment/<int:order_id>",views.update_order_payment,name="update_order_payment"),
     path("add_discount/<int:pk>",views.add_discount,name="add_discount"),
+    path("add_payment/<int:pk>",views.add_payment,name="add_payment"),
     path("save_order/<int:order_id>",views.save_order,name="save_order"),
 
 ]

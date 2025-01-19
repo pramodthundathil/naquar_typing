@@ -212,6 +212,7 @@ def add_customer(request):
 @login_required(login_url="signin")
 def customer_single(request, pk):
     service = get_object_or_404(Customers, pk=pk)
+    orders = Order.objects.filter(customer = service)
     form = CustomersForm(instance=service)
     if request.method == "POST":
         form = CustomersForm(request.POST, instance=service)
@@ -222,7 +223,7 @@ def customer_single(request, pk):
         else:
             messages.error(request, 'Service not updated')
             return redirect('customer_list')
-    return render(request, 'customer-single.html', {"form":form,"service":service} )
+    return render(request, 'customer-single.html', {"form":form,"service":service,"bookings":orders} )
 
 
 @login_required(login_url="signin")
