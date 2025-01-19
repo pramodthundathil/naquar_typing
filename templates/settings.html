@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<style>
+    .category-add-list {
+        width: 80% !important;
+        margin: auto;
+
+    }
+
+    @media (max-width:700px) {
+
+        .category-add-list {
+            width: 100% !important;
+
+        }
+    }
+</style>
+
+<div class="category-add-list">
+
+    <div class="content-page">
+        <div class="container-fluid add-form-list">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="header-title">
+                                <h4 class="card-title">Settings</h4>
+                                {% for message in messages %}
+                                <div class="alert {{ message.tags }}" role="alert" id="alert-{{ forloop.counter }}">
+                                    <div class="iq-alert-text"><b></b> {{ message }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h4>Change Password</h4>
+
+                            <form method="POST">
+                                    {% csrf_token %}
+                                <input type="password" name="cpswd" class="form-control" required placeholder="Current Password"><br>
+                                <input type="password" name="npswd" class="form-control" required placeholder="New Password"><br>
+                                <input type="password" name="cnpswd" class="form-control" required placeholder="Confirm New Password"><br>
+
+                                <button type="submit" class="btn btn-info">Change Password</button>
+
+
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Page end  -->
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

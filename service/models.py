@@ -64,6 +64,10 @@ class Services(models.Model):
         super(Services, self).save(*args, **kwargs)
 
 
+    def __str__(self):
+        return f"Service: {self.title} Authority: {self.authority}"
+
+
 class Customers(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField( null=True, blank=True)
@@ -78,8 +82,21 @@ class Customers(models.Model):
         return self.name
     
 
+from django.db import models, transaction
+
+# First, create a model to store the last used invoice number
+class InvoiceCounter(models.Model):
+    last_number = models.IntegerField(default=0)
+    
+    class Meta:
+        # Ensure we only have one counter record
+        constraints = [
+            models.UniqueConstraint(fields=['id'], name='singleton_counter')
+        ]
+
+
 class Order(models.Model):
-    customer = models.ForeignKey(Customers, on_delete=models.CASCADE,null=True,blank=True)
+    customer = models.ForeignKey(Customers, on_delete=models.SET_NULL,null=True,blank=True)
     invoice_number = models.CharField(max_length=20, unique=True)
     order_date = models.DateTimeField(auto_now_add=True)
 
@@ -121,7 +138,7 @@ class Order(models.Model):
         total_amount -= self.bill_discount
 
         # Update order fields
-        self.total_amount_from_customer = total_amount_from_customer
+        self.total_amount_from_customer = total_amount_from_customer - self.bill_discount
         self.service_fee = service_fee
         self.total_amount_before_discount = total_amount_before_discount
         self.total_tax = total_tax
@@ -137,12 +154,12 @@ class Order(models.Model):
         
     def save(self, *args, **kwargs):
         # Update balance amount before saving
-        self.balance_amount = self.total_amount - self.paid_amount
+        self.balance_amount = self.total_amount_from_customer - self.paid_amount
         
         # Update payment status based on payed amount
         if self.paid_amount == 0:
             self.payment_status1 = 'UNPAID'
-        elif self.paid_amount >= self.total_amount:
+        elif self.paid_amount >= self.total_amount_from_customer:
             self.payment_status1 = 'PAID'
         else:
             self.payment_status1 = 'PARTIALLY'
@@ -155,7 +172,8 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    service = models.ForeignKey(Services, on_delete=models.CASCADE, related_name="orderitem")
+    service_title = models.CharField(max_length=100, null=True, blank=True)
+    service = models.ForeignKey(Services, on_delete=models.SET_NULL, null=True, blank=True, related_name="orderitem")
     price_from_customer = models.FloatField()
     discount = models.FloatField(default=0)
     service_fee = models.FloatField(default=0)
@@ -163,8 +181,28 @@ class OrderItem(models.Model):
     total_tax = models.FloatField()  # Total tax for the item
 
     def save(self, *args, **kwargs):
-        self.total_price = self.service = self.total_tax - self.discount
+        # self.total_price = self.total_tax - self.
+        try:
+            self.service_title = self.service.title
+        except:
+            self.service_title = "No Service"
         super(OrderItem, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.service.title} - Order: {self.order}"
+        return f"{self.service_title} - Order: {self.order}"
+
+
+class OrderItemClient(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
+    service_order = models.OneToOneField(OrderItem, on_delete=models.CASCADE, related_name="service_order_client")
+    eid = models.CharField(max_length=20, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+
+
+
+class OrderItemStatus(models.Model):
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name='order_status')
+    Description = models.TextField()
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+

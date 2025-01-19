@@ -12,6 +12,16 @@ from datetime import datetime
 #importing forms
 from .forms import CustomUserCreationForm, CustomUserChangeForm 
 from .models import CustomUser
+from service.models import Order
+from finance.models import Income, Expense
+
+from django.utils import timezone
+from django.db.models import Sum
+import calendar
+
+
+
+
 
 # account functionalities 
 #
@@ -19,10 +29,59 @@ from .models import CustomUser
 def home(request):
     date_now = datetime.now()
     customerss = Customers.objects.all()
+    # Get today's date
+    today = timezone.now().date()
+
+    # Filter orders for today
+    today_orders = Order.objects.filter(order_date__date=today)
+    # Calculate the number of bookings
+    number_of_bookings = today_orders.count()
+    total_amount_today = today_orders.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+
+
+    # Get the current year and month
+    current_year = today.year
+    current_month = today.month
+    current_month_name = calendar.month_name[current_month]
+
+    # Filter orders for the current month
+    month_orders = Order.objects.filter(order_date__year=current_year, order_date__month=current_month)
+
+    # Calculate the number of bookings and total amount for the current month
+    number_of_bookings_month = month_orders.count()
+    total_amount_month = month_orders.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+
+
+    today_income = Income.objects.filter(date=today)
+    today_expense = Expense.objects.filter(date=today)
+
+    # Calculate totals for today
+    total_income_today = today_income.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense_today = today_expense.aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # **Income and Expense for This Month**
+    # Filter this month's income and expense
+    month_income = Income.objects.filter(date__year=current_year, date__month=current_month)
+    month_expense = Expense.objects.filter(date__year=current_year, date__month=current_month)
+
+    # Calculate totals for this month
+    total_income_month = month_income.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense_month = month_expense.aggregate(Sum('amount'))['amount__sum'] or 0
+
 
     context = {
         "date_now": date_now,
-        "customerss":customerss
+        "customerss":customerss,
+        "number_of_bookings":number_of_bookings,
+        "total_amount_today":total_amount_today,
+        "number_of_bookings_month":number_of_bookings_month,
+        "total_amount_month":total_amount_month,
+        "month":current_month_name,
+        "total_income_today":total_income_today,
+        "total_expense_today":total_expense_today,
+        "total_income_month":total_income_month,
+        "total_expense_month":total_expense_month
+
     }
     return render(request, "index.html",context)
 
@@ -172,3 +231,28 @@ def delete_customer(request, pk):
     service.delete()
     messages.success(request, 'Customer deleted successfully')
     return redirect('customer_list')
+
+
+@login_required(login_url='signin')
+def settings(request):
+    if request.method == "POST":
+        cpswd = request.POST.get('cpswd')
+        npswd = request.POST.get('npswd')
+        cnpswd = request.POST.get('cnpswd')
+
+        username = request.user.username
+        user = authenticate(request, username = username, password = cpswd)
+        if user is not None:
+            user = request.user
+            if npswd == cnpswd:
+                user.set_password(npswd)
+                user.save()
+                messages.error(request,"Password Changed successfully. Please Login To Continue.....")
+                return redirect(settings)
+            else:
+                messages.error(request,"Confirm password do not match")
+                return redirect(settings)
+        else:
+            messages.error(request,"You are entered wrong password")
+            return redirect(settings)
+    return render(request,"settings.html")

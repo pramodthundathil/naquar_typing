@@ -1,5 +1,5 @@
 from django import forms
-from .models import Services
+from .models import Services, OrderItemClient
 
 class ServicesForm(forms.ModelForm):
     class Meta:
@@ -36,4 +36,16 @@ class CustomersForm(forms.ModelForm):
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter address', 'rows': 3}),
             'eid_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter EID number'}),
             'customer_type': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+
+class OrderItemClientForm(forms.ModelForm):
+    class Meta:
+        model = OrderItemClient
+        exclude = ['service_order']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Name'}),
+            'eid': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Emirates Id Number'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter Description', 'rows': 3}),
         }

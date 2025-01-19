@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        @page {
+            margin: 10mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .top-margin {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .top-margin h2 {
+            margin: 0;
+        }
+
+        .top-margin p {
+            margin: 2px 0;
+        }
+
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 10px;
+            box-sizing: border-box;
+            margin-top: 20px;
+        }
+
+        .invoice-details .customer-details,
+        .invoice-details .order-info {
+            width: 48%;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .order-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-info td {
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .order-info td:last-child {
+            text-align: right;
+        }
+
+        .item-details {
+            margin: 20px auto;
+            width: 100%;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .item-details table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .item-details th,
+        .item-details td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+            font-size: 12px;
+            
+        }
+        
+        .item-details th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .item-details tr:last-child td {
+            border-bottom: none;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            width: 95%;
+            margin: 20px auto;
+            padding: 15px;
+            border: 1px  solid #333;
+            border-radius: 8px;
+        }
+
+        .footer .total-in-words {
+            width: 60%;
+            text-align: center;
+            border-right: 1px solid #333;
+            padding-right: 15px;
+        }
+
+        .footer .amount-details {
+            width: 40%;
+            padding-left: 15px;
+            line-height: 1.5;
+        }
+
+        .footer .amount-details p {
+            margin: 4px 0;
+        }
+
+        /* Print adjustments */
+        @media print {
+            .footer {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body onload="printInvoice()">
+    <div class="invoice" id="invoice-content">
+        <div class="top-margin">
+            <h2>NAQUAR</h2>
+            <p>Typing and Photocoping Office</p>
+            <p>Al Ain UAE</p>
+            <p>Ph: +971 508386239, +971 556851356</p>
+            <p><strong>TRN:</strong> 100391119300003</p>
+        </div>
+        
+        <div class="invoice-details">
+            <div class="customer-details">
+                <h5>Customer / اسم العميل</h5>
+                <p>{{ order.customer.name }}</p>
+                <p>{{ order.customer.city }}</p>
+            </div>
+            <div class="order-info">
+                <table>
+                    <tr>
+                        <td>Date</td>
+                        <td>{{ order.order_date }}</td>
+                    </tr>
+                    <tr>
+                        <td>Invoice Number</td>
+                        <td>{{ order.invoice_number }}</td>
+                    </tr>
+                    <tr>
+                        <td>Payment</td>
+                        <td>{{ order.payment_status1 }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="item-details">
+            <table>
+                <tr>
+                    <th>Sl No</th>
+                    <th>Service</th>
+                    <th>Discount</th>
+                    <th>Tax</th>
+                    <th>Total Price</th>
+                </tr>
+                {% for item in order.orderitem_set.all %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.service }}</td>
+                    <td>{{item.discount|floatformat:2 }}</td>
+                    <td>{{ item.total_tax|floatformat:2 }}</td>
+                    <td>{{ item.price_from_customer|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <div class="footer">
+            <div class="total-in-words">
+                <h6>{{ total_in_words }}</h6>
+            </div>
+            <div class="amount-details">
+                <p><strong>Total Amount:</strong> {{ order.total_amount|floatformat:2 }}</p>
+                <p><strong>Discount:</strong> {{ order.discount|floatformat:2 }}</p>
+                <p><strong>Tax:</strong> {{ order.total_tax|floatformat:2 }}</p>
+                <p><strong>Net Amount:</strong> 
+                    {{ order.total_amount_from_customer|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function printInvoice() {
+            var printContents = document.getElementById('invoice-content').innerHTML;
+            var originalContents = document.body.innerHTML;
+            document.body.innerHTML = printContents;
+            window.print();
+            document.body.innerHTML = originalContents;
+
+            setTimeout(function () {
+                window.close(); // Close the window after printing
+            }, 100); // 100ms delay, adjust if needed
+        }
+    </script>
+</body>
+
+</html>

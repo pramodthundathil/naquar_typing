@@ -8,3 +8,21 @@ class Tax(models.Model):
 
     def __str__(self):
         return '{}  {} %'.format(str(self.tax_name),(self.tax_percentage))
+
+
+from django.db import models
+
+class Income(models.Model):
+    date = models.DateField(auto_now_add=True)
+    particulars = models.CharField(max_length=255)
+    amount = models.FloatField()
+    bill_number = models.CharField(max_length=20, default="No Bill")
+    other = models.CharField(max_length=255, default=" ", null=True, blank=True)
+
+
+class Expense(models.Model):
+    date = models.DateField(auto_now_add=True)
+    particulars = models.CharField(max_length=255)
+    amount = models.FloatField()
+    bill_number = models.CharField(max_length=20, default="No Bill")
+    other = models.CharField(max_length=255, default=" ",null=True, blank=True)

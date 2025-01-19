@@ -20,4 +20,5 @@ urlpatterns = [
     path("customer_single/<int:pk>", views.customer_single, name="customer_single"),
     path("delete_customer/<int:pk>", views.delete_customer, name="delete_customer"),
 
+    path("settings",views.settings,name='settings')
 ]

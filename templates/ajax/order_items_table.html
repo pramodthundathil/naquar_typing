@@ -5,21 +5,55 @@
         <th>Price</th>
         <th>Govt. Charge</th>
         <th>Tax</th>
-        <th>Client</th>
+        <th>Total</th>
         <th>Actions</th>
     </tr>
     {% for item in order.orderitem_set.all %}
     <tr>
-        <td>{{ item.product.name }} {{item.product.unit_quantity}}{{item.product.unit}}</td>
-        <td><input type="number" value="{{ item.unit_price |floatformat:2 }}" name="unit_price" id="unit_price"
+        <td>
+            {{ item.service.title }}
+
+            <a data-bs-toggle="modal" data-bs-target="#client-add-{{item.id}}" class="badge bg-dark text-white">Add or
+                View Client Details</a>
+
+            <!-- Modal -->
+            <div class="modal fade" id="client-add-{{item.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                                Add Client Details</h5>
+                            <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">x</button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{%url 'add_client_to_service' item.id %}" method="post">
+                                {% csrf_token %}
+                                {{client_form.as_p}}
+
+
+                                <button type="submit" class="btn btn-primary">Save Data</button>
+                            </form>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </td>
+        <td><input type="number" value="{{ item.total_price |floatformat:2 }}" name="unit_price" id="unit_price"
                 class="form-control">
         </td>
-        <td><input type="number" value="{{ item.quantity }}" name="quantity" class="form-control"></td>
-        <td><input type="number" value="{{ item.discount  }}" name="discount" class="form-control"></td>
+        <td><input type="number" value="{{ item.service_fee }}" name="quantity" class="form-control"></td>
+        <td><input type="number" value="{{ item.total_tax  }}" name="discount" class="form-control"></td>
 
-        <td>{{ item.total_price |floatformat:2 }}</td>
+        <td>{{ item.price_from_customer |floatformat:2 }}</td>
         <td>
-            <button class="btn btn-sm btn-primary increase-quantity" data-item-id="{{ item.id }}">Delete</button>
+            <button class="btn btn-sm btn-primary delete-item" data-item-id="{{ item.id }}">Delete</button>
             <!-- <button class="btn btn-sm btn-secondary decrease-quantity" data-item-id="{{ item.id }}">-</button> -->
         </td>
     </tr>
@@ -28,100 +62,147 @@
         <th colspan="5"></th>
     </tr>
     <tr>
+        <td colspan="3" class="text-center bg-info-light">Net Total </td>
+        <td>inclusive of tax ({{order.total_tax|floatformat:2 }})</td>
+        <td style="font-size:medium;" colspan="2" class="bg-info-light text-left">
+            {{order.total_amount_before_discount|floatformat:2 }}
+        </td>
+        <!-- <th class="bg-info-light"></th> -->
+    </tr>
+    <tr>
+        <td colspan="4" class="text-center bg-info-light">Govt Fee</td>
+        <td style="font-size:large;" colspan="2" class="bg-info-light text-left">
+            {{order.service_fee|floatformat:2 }}
+        </td>
+        <!-- <th class="bg-info-light"></th> -->
+    </tr>
+
+    <tr>
+        <td colspan="4" class="text-center bg-info-light">Discount</td>
+        <td style="font-size:large;" colspan="2" class="bg-info-light text-left">
+            -{{order.bill_discount|floatformat:2 }}
+        </td>
+        <!-- <th class="bg-info-light"></th> -->
+    </tr>
+
+    <tr>
         <th colspan="4" class="text-center bg-info-light">Grand Total</th>
-        <th style="font-size: x-large;" id="total1" colspan="2" class="bg-info-light text-left">{{ order.total_amount|floatformat:2 }}
+        <th style="font-size: x-large;" id="total1" colspan="2" class="bg-info-light text-left">
+            {{order.total_amount_from_customer|floatformat:2 }}
         </th>
         <!-- <th class="bg-info-light"></th> -->
     </tr>
 </table>
 
 <div class="card">
+
     <div class="card-header d-flex justify-content-between">
         <div class="header-title">
-            <form id="payment" action="">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label>Total Amount:</label>
-                        <input type="number" class="form-control" readonly value="{{order.total_amount |floatformat:2}}"
-                            name="total_amount">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Amount Paid:</label>
-                        <br>
-                        <input type="number" class="form-control" id="amount-paid"
-                            value="{{order.payed_amount |floatformat:2}}" name="amount_paid">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Discount On total Bill:</label>
-                        <br>
-                        <input type="hidden" class="form-control" id="discount-amount" value="" name="discount_amount">
-                        <span class="text0-info">Bill Discount: {{order.bill_discount |floatformat:2}}</span>
-                        <a class="btn btn-sm btn-outline-primary" data-toggle="modal"
-                            data-target=".bd-example-modal-lg-discount">Add Bill Discount</a>
-
-
-                    </div>
-                    <div class="col-md-3">
-                        <label>Balance amount:</label>
-                        <br>
-                        <input type="number" readonly class="form-control" id="balance-amount"
-                            value="{{order.balance_amount |floatformat:2}}" name="balance_amount">
-
-                    </div>
-                    <div class="col-md-12">
-                        <h3 id="payment-status">{{order.payment_status1}}</h3>
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <a href="" target="_blank" class="btn btn-primary">Save and Print
-                            Invoice</a>
-                    </div>
-                    <div class="col-md-4 mt-3">
-                        <a href="" class="btn btn-secondary">Save</a>
-                    </div>
-                    <!-- <div class="col-md-4 mt-3">
-                        <a href="" class="btn btn-info">Discount</a>
-                    </div> -->
+            <!-- <form id="payment" action=""> -->
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Total Amount:</label>
+                    <input type="number" class="form-control" readonly
+                        value="{{order.total_amount_from_customer |floatformat:2}}" name="total_amount">
                 </div>
-            </form>
-        </div>
-    </div>
-    <div class="modal fade bd-example-modal-lg-discount" id="bill_discount" tabindex="-1" role="dialog"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Bill Discount</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="" data-toggle="validator">
-                        {% csrf_token %}
-                        <div class="row">
+                <div class="col-md-3">
+                    <label>Amount Paid:</label>
+                    <br>
+                    <input type="number" class="form-control" id="amount-paid"
+                        value="{{order.paid_amount |floatformat:2}}" name="amount_paid">
 
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="">Discount <sup></sup> </label>
-                                    <input type="number" step=".001" name="bill_discount" class="form-control"
-                                        placeholder="discount" id="bill_discount" required>
-                                    <div class="help-block with-errors"></div>
+                </div>
+                <div class="col-md-3">
+                    <label>Discount On total Bill:</label>
+                    <br>
+                    <input type="hidden" class="form-control" id="discount-amount" value="" name="discount_amount">
+                    <span class="text0-info">Bill Discount: {{order.bill_discount |floatformat:2}}</span>
+                    <a class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bill_discount">Add
+                        Bill Discount</a>
+
+
+
+                </div>
+                <div class="col-md-3">
+                    <label>Balance amount:</label>
+                    <br>
+                    <input type="number" readonly class="form-control" id="balance-amount"
+                        value="{{order.balance_amount |floatformat:2}}" name="balance_amount">
+
+                </div>
+                <div class="col-md-12">
+                    <h3 id="payment-status">{{order.payment_status1}}</h3>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <a href="{%url 'invoice' order.id %}" target="_blank" class="btn btn-primary">Print
+                        Invoice</a>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <a data-bs-toggle="modal" data-bs-target="#exampleModal{{order.id}}"
+                        class="btn btn-secondary">Save</a>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal{{order.id}}" tabindex="-1"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <div class="modal-body">
+                                    <p>Are you sure you want to save this service?</p>
+                                    <p class="text-info" style="font-size: small;">
+                                        <span class="text-danger"><sup>**</sup></span>
+                                        Saving this service will reflect the payment amount in income records.
+                                        Once saved, you will not be able to edit the service booking.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <a href="{%url 'save_order' order.id %}" class="btn btn-primary">Save Changes</a>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
+
+                </div>
+                <!-- <div class="col-md-4 mt-3">
+                        <a href="" class="btn btn-info">Discount</a>
+                    </div> -->
+            </div>
+            <!-- </form> -->
+            <div class="modal fade" id="bill_discount" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add Bill Discount</h5>
+                            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button> -->
+                        </div>
+                        <div class="modal-body">
+                            <form action="{%url 'add_discount' order.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="number" name="discount" required class="form-control"
+                                    placeholder="discount"><br>
+                                <button type="submit" class="btn btn-info">Save</button>
+                            </form>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Add Bill Discount</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
+                    </div>
                 </div>
             </div>
+
         </div>
+
     </div>
+
+
+
+
 </div>
+
 
 <script src=""></script>
 
@@ -147,14 +228,15 @@
 
             // Send AJAX request to update the backend
             $.ajax({
-                url: "", // Update with your URL pattern name
+                url: "{%url 'update_order_payment' order.id %}", // Update with your URL pattern name
                 type: "POST",
                 data: {
                     csrfmiddlewaretoken: '{{ csrf_token }}',
-                    payed_amount: amountPaid
+                    paid_amount: amountPaid
                 },
                 success: function (response) {
                     console.log("Order payment updated successfully.");
+
                 },
                 error: function (xhr, errmsg, err) {
                     console.log("Error updating order payment:", errmsg);
@@ -205,5 +287,6 @@
 
         $('#amount-paid, #discount-amount').on('input', calculateBalance);
     });
+
 
 </script>
