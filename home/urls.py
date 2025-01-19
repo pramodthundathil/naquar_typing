@@ -20,5 +20,7 @@ urlpatterns = [
     path("customer_single/<int:pk>", views.customer_single, name="customer_single"),
     path("delete_customer/<int:pk>", views.delete_customer, name="delete_customer"),
 
-    path("settings",views.settings,name='settings')
+    path("settings",views.settings,name='settings'),
+    path('weekly_order_chart_data/', views.weekly_order_chart_data, name='weekly_order_chart_data'),
+    path('income_expense_chart_json/', views.income_expense_chart_json, name='income_expense_chart_json'),
 ]

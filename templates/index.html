@@ -677,27 +677,26 @@
               <div class="card">
                 <div class="card-body">
                   <p class="card-title">Order Details</p>
-                  <p class="font-weight-500">The total number of sessions within the date range. It is the period time a
-                    user is actively engaged with your website, page or app, etc</p>
+                  <p class="font-weight-500">The total number of orders and corresponding amounts during the date range reflect user order activity on your platform.</p>
                   <div class="d-flex flex-wrap mb-5">
                     <div class="mr-5 mt-3">
-                      <p class="text-muted">Order value</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">12.3k</h3>
+                      <p class="text-muted">Order value (This Week)</p>
+                      <h3 class="text-primary fs-20 font-weight-medium">{{ this_week.total_amount }} AED</h3>
                     </div>
                     <div class="mr-5 mt-3">
-                      <p class="text-muted">Orders</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">14k</h3>
+                      <p class="text-muted">Orders (This Week)</p>
+                      <h3 class="text-primary fs-20 font-weight-medium">{{ this_week.order_count }}</h3>
                     </div>
                     <div class="mr-5 mt-3">
-                      <p class="text-muted">Users</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">71.56%</h3>
+                      <p class="text-muted">Order Value (Last Week)</p>
+                      <h3 class="text-primary fs-20 font-weight-medium">{{ last_week.total_amount }} AED</h3>
                     </div>
                     <div class="mt-3">
-                      <p class="text-muted">Downloads</p>
-                      <h3 class="text-primary fs-30 font-weight-medium">34040</h3>
+                      <p class="text-muted">Orders (Last Week)</p>
+                      <h3 class="text-primary fs-20 font-weight-medium">{{ last_week.order_count }}</h3>
                     </div>
                   </div>
-                  <canvas id="order-chart"></canvas>
+                  <canvas id="order-chart1"></canvas>
                 </div>
               </div>
             </div>
@@ -705,18 +704,18 @@
               <div class="card">
                 <div class="card-body">
                   <div class="d-flex justify-content-between">
-                    <p class="card-title">Sales Report</p>
+                    <p class="card-title">Income Report</p>
                     <a href="#" class="text-info">View all</a>
                   </div>
-                  <p class="font-weight-500">The total number of sessions within the date range. It is the period time a
-                    user is actively engaged with your website, page or app, etc</p>
+                  <p class="font-weight-500">The total Amount of Income And Expense within the date range</p>
                   <div id="sales-legend" class="chartjs-legend mt-4 mb-2"></div>
-                  <canvas id="sales-chart"></canvas>
+                  <div class="mt-5" style="height: 100px;"></div>
+                  <canvas id="income-expense-chart"></canvas>
                 </div>
               </div>
             </div>
           </div>
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
               <div class="card position-relative">
                 <div class="card-body">
@@ -1273,29 +1272,61 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title">Advanced Table</p>
+                  <p class="card-title">Recent Order Table</p>
                   <div class="row">
                     <div class="col-12">
                       <div class="table-responsive">
-                        <table id="" class="display expandable-table" style="width:100%">
-                          <thead>
-                            <tr>
-                              <th>Quote#</th>
-                              <th>Product</th>
-                              <th>Business type</th>
-                              <th>Policy holder</th>
-                              <th>Premium</th>
-                              <th>Status</th>
-                              <th>Updated at</th>
-                              <th></th>
-                            </tr>
+                        <table id="userTable" class="table table-striped table-borderless display expandable-table">
+                          <thead class="bg-white text-uppercase">
+                              <tr class="ligth ligth-data">
+                                  <th>
+                                      <div class="checkbox d-inline-block">
+                                          <input type="checkbox" class="checkbox-input" id="checkbox1">
+                                          <label for="checkbox1" class="mb-0"></label>
+                                      </div>
+                                  </th>
+                                  <th>Customer Name</th>
+                                  <th>Invoice Number</th>
+                                  <th>Order Date</th>
+                                  <th>Total Amount</th>
+                                  <th>Paid Amount</th>
+                                  <th>Balance Amount</th>
+                                  <th>Payment Status</th>
+                                  <th>Actions</th>
+                              </tr>
                           </thead>
-                        </table>
+                          <tbody>
+                              {% for order in bookings %}
+                              <tr>
+                                  <td>
+                                      <div class="checkbox d-inline-block">
+                                          <input type="checkbox" class="checkbox-input" id="checkbox{{ order.id }}">
+                                          <label for="checkbox{{ order.id }}" class="mb-0"></label>
+                                      </div>
+                                  </td>
+                                  <td>{{ order.customer.name }}</td>
+                                  <td>{{ order.invoice_number }}</td>
+                                  <td>{{ order.order_date|date:"Y-m-d H:i" }}</td>
+                                  <td>{{ order.total_amount_from_customer }}</td>
+                                  <td>{{ order.paid_amount }}</td>
+                                  <td>{{ order.balance_amount }}</td>
+                                  <td>{{ order.payment_status1 }}</td>
+                                  <td>
+                                      <a href="{%url 'edit_order_booking' order.id %}" class="btn btn-dark"><i class="bi bi-pencil-square"></i></a>
+                                      <a href="{% url 'create_booking' order.id %}" class="btn btn-info"><i class="bi bi-receipt-cutoff"></i> Bill</a>
+                                      <a href="{% url 'delete_order' order.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete?')">
+                                          <i class="bi bi-trash3"></i>
+                                      </a>
+                                  </td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
                       </div>
                     </div>
                   </div>
@@ -1488,7 +1519,121 @@
 
   </script>
 
+<!-- charts  -->
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('order-chart1').getContext('2d');
+
+        fetch('{%url "weekly_order_chart_data" %}')
+            .then(response => response.json())
+            .then(data => {
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'This Week',
+                                data: data.this_week_data,
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                fill: true,
+                            },
+                            {
+                                label: 'Last Week',
+                                data: data.last_week_data,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: true,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                        },
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Order Amount',
+                                },
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Weekday',
+                                },
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('income-expense-chart').getContext('2d');
+
+        // Fetch data from the backend
+        fetch('{%url "income_expense_chart_json" %}')
+            .then(response => response.json())
+            .then(data => {
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.weekdays, // Weekdays from JSON response
+                        datasets: [
+                            {
+                                label: 'Income',
+                                data: data.income_data, // Income data from JSON response
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderWidth: 1,
+                            },
+                            {
+                                label: 'Expense',
+                                data: data.expense_data, // Expense data from JSON response
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderWidth: 1,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Amount',
+                                },
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Weekdays',
+                                },
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
 
 
 

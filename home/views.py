@@ -16,7 +16,7 @@ from service.models import Order
 from finance.models import Income, Expense
 
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Count
 import calendar
 
 
@@ -29,6 +29,8 @@ import calendar
 def home(request):
     date_now = datetime.now()
     customerss = Customers.objects.all()
+
+    bookings = Order.objects.all().order_by('-order_date')[:10]
     # Get today's date
     today = timezone.now().date()
 
@@ -68,6 +70,27 @@ def home(request):
     total_income_month = month_income.aggregate(Sum('amount'))['amount__sum'] or 0
     total_expense_month = month_expense.aggregate(Sum('amount'))['amount__sum'] or 0
 
+    ## sending order data weekly ===========================================
+
+    start_of_this_week = today - timedelta(days=today.weekday())  # Start of this week (Monday)
+    start_of_last_week = start_of_this_week - timedelta(weeks=1)  # Start of last week
+
+    # Current week data
+    this_week_data = Order.objects.filter(order_date__gte=start_of_this_week)\
+        .aggregate(
+            total_amount=Sum('total_amount'),
+            order_count=Count('id')
+        )
+
+    # Last week data
+    last_week_data = Order.objects.filter(order_date__gte=start_of_last_week, order_date__lt=start_of_this_week)\
+        .aggregate(
+            total_amount=Sum('total_amount'),
+            order_count=Count('id')
+        )
+    ## sending order data weekly end ===========================================
+
+
 
     context = {
         "date_now": date_now,
@@ -80,10 +103,94 @@ def home(request):
         "total_income_today":total_income_today,
         "total_expense_today":total_expense_today,
         "total_income_month":total_income_month,
-        "total_expense_month":total_expense_month
+        "total_expense_month":total_expense_month,
+        "this_week": {
+            "total_amount": this_week_data['total_amount'] or 0,
+            "order_count": this_week_data['order_count'] or 0,
+        },
+        "last_week": {
+            "total_amount": last_week_data['total_amount'] or 0,
+            "order_count": last_week_data['order_count'] or 0,
+        },
+        "bookings":bookings
 
     }
     return render(request, "index.html",context)
+
+
+# weekly chat display 
+
+from django.http import JsonResponse
+from django.db.models import Sum
+from datetime import datetime, timedelta
+
+def weekly_order_chart_data(request):
+    today = datetime.now()
+    start_of_this_week = today - timedelta(days=today.weekday())
+    start_of_last_week = start_of_this_week - timedelta(weeks=1)
+
+    # Calculate data for this week
+    this_week_data = Order.objects.filter(order_date__gte=start_of_this_week)\
+        .values('order_date__week_day')\
+        .annotate(total_amount=Sum('total_amount'))
+
+    # Calculate data for last week
+    last_week_data = Order.objects.filter(order_date__gte=start_of_last_week, order_date__lt=start_of_this_week)\
+        .values('order_date__week_day')\
+        .annotate(total_amount=Sum('total_amount'))
+
+    # Initialize data arrays
+    weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    this_week_chart_data = [0] * 7
+    last_week_chart_data = [0] * 7
+
+    # Map data to weekday
+    for entry in this_week_data:
+        weekday = entry['order_date__week_day'] - 1  # Django weekday starts from 1 (Sunday)
+        this_week_chart_data[weekday] = entry['total_amount']
+
+    for entry in last_week_data:
+        weekday = entry['order_date__week_day'] - 1
+        last_week_chart_data[weekday] = entry['total_amount']
+
+    return JsonResponse({
+        "labels": weekdays,
+        "this_week_data": this_week_chart_data,
+        "last_week_data": last_week_chart_data,
+    })
+
+def income_expense_chart_json(request):
+    today = datetime.now()
+    start_of_this_week = today - timedelta(days=today.weekday())  # Start of this week (Monday)
+
+    # Initialize amounts for all weekdays (0 for empty days)
+    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    income_data = [0] * 7
+    expense_data = [0] * 7
+
+    # Income data for this week
+    income_queryset = Income.objects.filter(date__gte=start_of_this_week)\
+        .values('date__week_day')\
+        .annotate(total_amount=Sum('amount'))
+    for entry in income_queryset:
+        weekday = entry['date__week_day'] - 2  # Adjust: Monday starts at 0
+        income_data[weekday] = entry['total_amount']
+
+    # Expense data for this week
+    expense_queryset = Expense.objects.filter(date__gte=start_of_this_week)\
+        .values('date__week_day')\
+        .annotate(total_amount=Sum('amount'))
+    for entry in expense_queryset:
+        weekday = entry['date__week_day'] - 2
+        expense_data[weekday] = entry['total_amount']
+
+    # Send data as JSON
+    return JsonResponse({
+        "weekdays": weekdays,
+        "income_data": income_data,
+        "expense_data": expense_data,
+    })
+
 
 @unauthenticated_user
 def signin(request):
