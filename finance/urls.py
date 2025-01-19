@@ -38,5 +38,15 @@ urlpatterns = [
     path('expence_report_pdf/', views.expence_report_pdf, name='expence_report_pdf'),
     path('income_report_excel/', views.income_report_excel, name='income_report_excel'),
     path('income_report_pdf/', views.income_report_pdf, name='income_report_pdf'),
+    path('sale_report_excel/', views.sale_report_excel, name='sale_report_excel'),
+    path('sale_report_pdf/', views.sale_report_pdf, name='sale_report_pdf'),
+    path('sale_report_product_excel/', views.sale_report_product_excel, name='sale_report_product_excel'),
+    path('sale_report_product_pdf/', views.sale_report_product_pdf, name='sale_report_product_pdf'),
+    path('sale_report_excel_customer_wise/', views.sale_report_excel_customer_wise, name='sale_report_excel_customer_wise'),
+    path('sale_report_pdf_customer_wise/', views.sale_report_pdf_customer_wise, name='sale_report_pdf_customer_wise'),
+    path('finance_expense_report_excel/', views.finance_expense_report_excel, name='finance_expense_report_excel'),
+    path('finance_expense_report_pdf/', views.finance_expense_report_pdf, name='finance_expense_report_pdf'),
+    path('summery_report_pdf/', views.summery_report_pdf, name='summery_report_pdf'),
+    path('summery_report_excel/', views.summery_report_excel, name='summery_report_excel'),
    
 ]

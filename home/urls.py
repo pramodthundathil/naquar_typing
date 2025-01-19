@@ -7,6 +7,9 @@ urlpatterns = [
     path("", views.signin, name="signin"),
     path("signout/", views.signout, name="signout"),
 
+
+    
+
     # user configuration 
     path("users_add",views.users_add,name="users_add"),
     path("add_user_form",views.add_user_form,name="add_user_form"),
@@ -24,3 +27,8 @@ urlpatterns = [
     path('weekly_order_chart_data/', views.weekly_order_chart_data, name='weekly_order_chart_data'),
     path('income_expense_chart_json/', views.income_expense_chart_json, name='income_expense_chart_json'),
 ]
+
+handler404 = views.custom_page_not_found_view
+handler500 = views.custom_server_error_view
+handler403 = views.custom_permission_denied_view
+handler400 = views.custom_bad_request_view
