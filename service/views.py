@@ -234,6 +234,7 @@ def update_order_payment(request, order_id):
 
 
 @login_required(login_url='signin')
+@csrf_exempt 
 def add_discount(request, pk):
     order = get_object_or_404(Order, id =pk)
     if request.method == "POST":
@@ -246,6 +247,7 @@ def add_discount(request, pk):
     
 
 @login_required(login_url='signin')
+@csrf_exempt 
 def add_payment(request, pk):
     order = Order.objects.get(id = pk)
     if request.method == "POST":
