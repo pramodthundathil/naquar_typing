@@ -12,42 +12,46 @@
 
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
             margin: 0;
             padding: 0;
         }
 
         .top-margin {
-            padding: 20px;
             text-align: center;
+            padding: 10px 0;
             border-bottom: 1px solid #333;
         }
 
         .top-margin h2 {
+            font-size: 16px;
             margin: 0;
         }
 
         .top-margin p {
             margin: 2px 0;
+            font-size: 10px;
         }
 
         .invoice-details {
             display: flex;
             justify-content: space-between;
-            padding: 20px 10px;
+            padding: 10px;
             box-sizing: border-box;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
-        .invoice-details .customer-details,
-        .invoice-details .order-info {
-            width: 48%;
+        .customer-details,
+        .order-info {
+            width: 40%;
             border: 1px solid #333;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 10px;
         }
 
         .order-info table {
-            width: 100%;
+            width: 90%;
             border-collapse: collapse;
         }
 
@@ -61,60 +65,56 @@
         }
 
         .item-details {
-            margin: 20px auto;
+            margin: 10px auto;
             width: 100%;
             border: 1px solid #333;
-            border-radius: 8px;
+            border-radius: 5px;
             overflow: hidden;
-            padding: 15px;
+            padding: 10px;
             box-sizing: border-box;
         }
 
         .item-details table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: auto;
         }
 
         .item-details th,
         .item-details td {
-            padding: 10px;
+            padding: 8px;
             border-bottom: 1px solid #ccc;
             text-align: center;
-            font-size: 12px;
-            
+            font-size: 10px;
         }
-        
+
         .item-details th {
             background-color: #f5f5f5;
             font-weight: bold;
-        }
-
-        .item-details tr:last-child td {
-            border-bottom: none;
         }
 
         .footer {
             display: flex;
             justify-content: space-between;
             width: 95%;
-            margin: 20px auto;
-            padding: 15px;
-            border: 1px  solid #333;
-            border-radius: 8px;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            font-size: 10px;
         }
 
         .footer .total-in-words {
             width: 60%;
             text-align: center;
             border-right: 1px solid #333;
-            padding-right: 15px;
+            padding-right: 10px;
         }
 
         .footer .amount-details {
             width: 40%;
-            padding-left: 15px;
-            line-height: 1.5;
+            padding-left: 10px;
+            line-height: 1.4;
         }
 
         .footer .amount-details p {
@@ -123,6 +123,10 @@
 
         /* Print adjustments */
         @media print {
+            body {
+                font-size: 10px;
+            }
+
             .footer {
                 page-break-inside: avoid;
             }
@@ -134,19 +138,19 @@
     <div class="invoice" id="invoice-content">
         <div class="top-margin">
             <h2>NAQUAR</h2>
-            <p>Typing and Photocoping Office</p>
+            <p>Typing and Photocopying Office</p>
             <p>Al Ain UAE</p>
             <p>Ph: +971 508386239, +971 556851356</p>
             <p><strong>TRN:</strong> 100391119300003</p>
         </div>
-        
+
         <div class="invoice-details">
-            <div class="customer-details">
+            <div class="customer-details details">
                 <h5>Customer / اسم العميل</h5>
                 <p>{{ order.customer.name }}</p>
                 <p>{{ order.customer.city }}</p>
             </div>
-            <div class="order-info">
+            <div class="order-info details">
                 <table>
                     <tr>
                         <td>Date</td>
@@ -163,7 +167,7 @@
                 </table>
             </div>
         </div>
-        
+
         <div class="item-details">
             <table>
                 <tr>
@@ -177,23 +181,24 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ item.service }}</td>
-                    <td>{{item.discount|floatformat:2 }}</td>
+                    <td>{{ item.discount|floatformat:2 }}</td>
                     <td>{{ item.total_tax|floatformat:2 }}</td>
                     <td>{{ item.price_from_customer|floatformat:2 }}</td>
                 </tr>
                 {% endfor %}
             </table>
         </div>
-        
+
         <div class="footer">
             <div class="total-in-words">
                 <h6>{{ total_in_words }}</h6>
             </div>
             <div class="amount-details">
                 <p><strong>Total Amount:</strong> {{ order.total_amount|floatformat:2 }}</p>
+                <p><strong>Govt Fee:</strong> {{ order.service_fee|floatformat:2 }}</p>
                 <p><strong>Discount:</strong> {{ order.discount|floatformat:2 }}</p>
                 <p><strong>Tax:</strong> {{ order.total_tax|floatformat:2 }}</p>
-                <p><strong>Net Amount:</strong> 
+                <p><strong>Net Amount:</strong>
                     {{ order.total_amount_from_customer|floatformat:2 }}</p>
             </div>
         </div>

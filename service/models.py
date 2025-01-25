@@ -117,6 +117,13 @@ class Order(models.Model):
     paid_amount = models.FloatField(default=0)
     balance_amount = models.FloatField(default=0)
 
+    delivery_status = models.CharField(max_length=30, default="Not Delivered", choices= (
+                                                                                            ("Not Delivered", "Not Delivered"),
+                                                                                            ("Partially Delivered", "Partially Delivered"),
+                                                                                            ("Delivered", "Delivered"),
+                                                                                            ("Cancelled", "Cancelled"),
+                                                                                        ))
+
     def update_totals(self):
         total_amount_from_customer = 0
         service_fee = 0
@@ -179,6 +186,13 @@ class OrderItem(models.Model):
     service_fee = models.FloatField(default=0)
     total_price = models.FloatField()  # Total price after discount and tax
     total_tax = models.FloatField()  # Total tax for the item
+    delivery_status = models.CharField(max_length=30, default="Not Delivered", choices= (
+                                                                                            ("Not Delivered", "Not Delivered"),
+                                                                                            ("Partially Delivered", "Partially Delivered"),
+                                                                                            ("Delivered", "Delivered"),
+                                                                                            ("Cancelled", "Cancelled"),
+                                                                                            
+                                                                                        ))
 
     def save(self, *args, **kwargs):
         # self.total_price = self.total_tax - self.

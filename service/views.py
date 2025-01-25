@@ -486,6 +486,37 @@ def save_order(request, order_id):
         return redirect("create_booking",pk = order_id)
 
 
+@login_required(login_url='SignIn')
+def change_delivery_status(request, order_id):
+    
+    order = get_object_or_404(Order, id=order_id)
+
+    order.delivery_status = "Delivered"
+    order.save()
+
+    order_items = order.orderitem_set.all()
+    order_items.update(delivery_status="Delivered")
+
+    return redirect(edit_order_booking, pk=order_id)
+
+
+@login_required(login_url='SignIn')
+def change_delivery_status_to_service_item(request, order_id):
+   
+    order_item = get_object_or_404(OrderItem, id=order_id)
+    order_item.delivery_status = "Delivered"
+    order_item.save()
+    all_items_delivered = order_item.order.orderitem_set.all().filter(delivery_status="Delivered").count() == order_item.order.orderitem_set.count()
+
+    if all_items_delivered:
+        order_item.order.delivery_status = "Delivered"
+    else:
+        order_item.order.delivery_status = "Partially Delivered"
+
+    order_item.order.save()
+
+    return redirect(edit_order_booking, pk=order_item.order.id)
+
 
 
 

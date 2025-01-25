@@ -22,6 +22,8 @@ urlpatterns = [
     path("edit_order_booking/<int:pk>",views.edit_order_booking,name="edit_order_booking"),
     path("add_client_form_edit_tab/<int:pk>",views.add_client_form_edit_tab,name="add_client_form_edit_tab"),
     path("create_status_update/<int:pk>",views.create_status_update,name="create_status_update"),
+    path("change_delivery_status/<int:order_id>",views.change_delivery_status,name="change_delivery_status"),
+    path("change_delivery_status_to_service_item/<int:order_id>",views.change_delivery_status_to_service_item,name="change_delivery_status_to_service_item"),
 
     path("update_order_payment/<int:order_id>",views.update_order_payment,name="update_order_payment"),
     path("add_discount/<int:pk>",views.add_discount,name="add_discount"),

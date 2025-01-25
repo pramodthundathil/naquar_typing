@@ -66,10 +66,10 @@
 
             </td>
             <td><input type="number" value="{{ item.total_price |floatformat:2 }}" name="unit_price" id="unit_price"
-                    class="form-control">
+                    class="form-control" readonly>
             </td>
-            <td><input type="number" value="{{ item.service_fee }}" name="quantity" class="form-control"></td>
-            <td><input type="number" value="{{ item.total_tax  }}" name="discount" class="form-control"></td>
+            <td><input type="number" value="{{ item.service_fee }}" name="quantity" class="form-control" readonly></td>
+            <td><input type="number" value="{{ item.total_tax  }}" name="discount" class="form-control" readonly></td>
 
             <td>{{ item.price_from_customer |floatformat:2 }}</td>
             <td>

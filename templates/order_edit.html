@@ -23,6 +23,18 @@
                         <h4 class="mb-3">Service Edit</h4>
                         <p>Order Number: <strong>{{ order.invoice_number }}</strong></p>
                     </div>
+                    <div>
+                        <strong>Order Status: </strong>
+                        {% if order.delivery_status == 'Delivered' %}
+                        <span class="badge bg-success">{{order.delivery_status}}</span>
+                        {% else %}
+                        <span class="badge bg-warning">{{order.delivery_status}}</span>
+                        <br><br>
+                        <a href="{%url 'change_delivery_status' order.id %}" class="btn btn-outline-success">Change
+                            Status To Delivered</a>
+                        {% endif %}
+
+                    </div>
                 </div>
 
                 <div class="row">
@@ -43,6 +55,7 @@
                                         {{ order.customer }}
                                     </td>
                                 </tr>
+                               
                                 <tr>
                                     <td>Details</td>
                                     <td>
@@ -211,6 +224,21 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        <tr>
+                                                            <tr>
+                                                                <td>Status</td>
+                                                                <th>
+                                                                    {% if order.delivery_status == 'Delivered' %}
+                                                                    <span class="badge bg-success">{{item.delivery_status}}</span>
+                                                                    {% else %}
+                                                                    <span class="badge bg-warning">{{item.delivery_status}}</span>
+                                                                    <br><br>
+                                                                    <a href="{%url 'change_delivery_status_to_service_item' item.id %}"
+                                                                        class="btn btn-outline-success btn-sm">Change Status To Delivered</a>
+                                                                    {% endif %}
+                                                                </th>
+                                                            </tr>
+                                                        </tr>
                                                         <tr>
                                                             <td>Price from Customer</td>
                                                             <td>{{ item.price_from_customer }}</td>
