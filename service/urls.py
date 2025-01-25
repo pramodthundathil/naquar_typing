@@ -30,4 +30,7 @@ urlpatterns = [
     path("add_payment/<int:pk>",views.add_payment,name="add_payment"),
     path("save_order/<int:order_id>",views.save_order,name="save_order"),
 
+    path("filter_booking",views.filter_booking,name="filter_booking"),
+    path("filter_booking_ajax",views.filter_booking_ajax,name="filter_booking_ajax")
+
 ]

@@ -1,0 +1,126 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="content-page card position-relative">
+    <div class="container-fluid card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mb-4">
+                    <div>
+                        <h4 class="mb-3">Filter Data</h4>
+
+                        <form id="order-filter-form">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    <label for="payment-status">Payment Status:</label>
+                                    <select id="payment-status" class="form-control" name="payment_status1">
+                                        <option value="">All</option>
+                                        <option value="UNPAID">UNPAID</option>
+                                        <option value="PAID">PAID</option>
+                                        <option value="PARTIALLY">PARTIALLY</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="delivery-status">Delivery Status:</label>
+                                    <select id="delivery-status" class="form-control" name="delivery_status">
+                                        <option value="">All</option>
+                                        <option value="Not Delivered">Not Delivered</option>
+                                        <option value="Partially Delivered">Partially Delivered</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="total-amount">Total Amount (Greater Than):</label>
+                                    <input type="number" class="form-control" id="total-amount" name="total_amount"
+                                        min="0">
+                                </div>
+                                <div class="col-md-3">
+
+                                    <button type="submit" class="btn btn-dark mt-4" id="apply-filters-btn">Apply
+                                        Filters</button>
+                                </div>
+                            </div>
+                        </form>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12" id="filter-data" style="overflow: auto;">
+
+
+                {% include 'ajax/filter.html' %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        $('#orders-table').DataTable({
+            responsive: true, // Optional: Makes the table responsive
+            paging: true,     // Enables pagination
+            searching: true,  // Enables search functionality
+            ordering: true,   // Enables column sorting
+            info: true        // Shows table information
+        });
+    });
+
+
+    document.getElementById('order-filter-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Get filter values from the form
+        const paymentStatus = document.getElementById('payment-status').value;
+        const deliveryStatus = document.getElementById('delivery-status').value;
+        const totalAmount = document.getElementById('total-amount').value;
+
+        // Send AJAX request to filter orders
+        document.getElementById('order-filter-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get filter values from the form
+            const paymentStatus = document.getElementById('payment-status').value;
+            const deliveryStatus = document.getElementById('delivery-status').value;
+            const totalAmount = document.getElementById('total-amount').value;
+
+            // Send AJAX request to filter orders
+            fetch("{% url 'filter_booking_ajax' %}?payment_status1=" + paymentStatus + "&delivery_status=" + deliveryStatus + "&total_amount=" + totalAmount)
+                .then(response => response.json())
+                .then(data => {
+                    // Check if the request was successful
+                    if (data.success) {
+                        // Inject the filtered HTML into the #filter-data div
+                        document.getElementById('filter-data').innerHTML = data.html;
+
+                        // Reinitialize DataTable on the new content
+                        $('#orders-table').DataTable({
+                            responsive: true, // Optional: Makes the table responsive
+                            paging: true,     // Enables pagination
+                            searching: true,  // Enables search functionality
+                            ordering: true,   // Enables column sorting
+                            info: true        // Shows table information
+                        });
+                    } else {
+                        alert('No orders found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+    });
+
+
+</script>
+
+{% endblock %}

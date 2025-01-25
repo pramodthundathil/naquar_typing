@@ -518,8 +518,44 @@ def change_delivery_status_to_service_item(request, order_id):
     return redirect(edit_order_booking, pk=order_item.order.id)
 
 
+@login_required(login_url='SignIn')
+def filter_booking(request):
+    orders = Order.objects.all()
+
+    # Apply filters if present in the request
+    if 'payment_status1' in request.GET and request.GET['payment_status1']:
+        orders = orders.filter(payment_status1=request.GET['payment_status1'])
+
+    if 'delivery_status' in request.GET and request.GET['delivery_status']:
+        orders = orders.filter(delivery_status=request.GET['delivery_status'])
+
+    if 'total_amount' in request.GET and request.GET['total_amount']:
+        orders = orders.filter(total_amount__gte=request.GET['total_amount'])
 
 
+    return render(request,"filter_for_order.html",{"orders":orders})
+
+
+
+
+@csrf_exempt
+def filter_booking_ajax(request):
+    orders = Order.objects.all()
+    if 'payment_status1' in request.GET and request.GET['payment_status1']:
+        orders = orders.filter(payment_status1=request.GET['payment_status1'])
+
+    if 'delivery_status' in request.GET and request.GET['delivery_status']:
+        orders = orders.filter(delivery_status=request.GET['delivery_status'])
+
+    if 'total_amount' in request.GET and request.GET['total_amount']:
+        orders = orders.filter(total_amount_from_customer__gte=request.GET['total_amount'])
+    customer_details_html = render_to_string('ajax/filter.html', {"orders" : orders})
+
+    return JsonResponse({"success": True,"message":"order found", "html": customer_details_html})
+        
+       
+
+    
 
 
 
