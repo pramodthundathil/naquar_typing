@@ -139,29 +139,52 @@ def create_booking(request, pk):
 
 @login_required(login_url='signin')
 @csrf_exempt
-def add_order_item(request,pk):
+def add_order_item(request, pk):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
         client_form = OrderItemClientForm()
-        print(product_id,")))))))))))))))))))))))))))))))))))))))))))")
+        print(product_id, "))))))))))))))))))))))))))))))))))))))))))")
+        
         try:
             order = Order.objects.get(id=pk)
             if order.save_status == True:
                 return JsonResponse({"success": False, "error": "Cannot Be added New Item to This order"})
+            
             product = Services.objects.get(id=product_id)
-            order_item = OrderItem.objects.create(order=order, service=product, price_from_customer = product.total_fund_from_customer,service_fee = product.govt_fee ,total_price = product.price, total_tax = product.tax_amount)
+            
+            # Create order item with base values
+            order_item = OrderItem.objects.create(
+                order=order, 
+                service=product, 
+                price_from_customer=product.total_fund_from_customer,  # This will be the base price
+                service_fee=product.govt_fee,
+                total_price=product.price, 
+                total_tax=product.tax_amount,
+                govt_fine=0,  # Default to 0, can be updated later
+                extra_amount=0  # Default to 0, can be updated later
+            )
+            
+            # The save method will handle the price calculations
             order_item.save()    
             
-            # order.update_totals()
+            # order.update_totals()  # Uncomment if you have this method
             
             # Render the order items table
-            order_items_html = render_to_string('ajax/order_items_table.html', {'order': order,"client_form":client_form})
+            order_items_html = render_to_string('ajax/order_items_table.html', {
+                'order': order,
+                "client_form": client_form
+            })
             return JsonResponse({"success": True, "html": order_items_html})
+            
         except Order.DoesNotExist:
             return JsonResponse({"success": False, "error": "Order not found"})
         except Services.DoesNotExist:
             return JsonResponse({"success": False, "error": "Product not found"})
+    
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+
+
 
 
 @login_required(login_url='signin')
@@ -200,6 +223,8 @@ def delete_order_item(request):
             # print(customer_details_html)
             return JsonResponse({"success": True,"message":"Item Deleted", "html": customer_details_html})
     return JsonResponse({"success": False, "message": "Invalid request."})
+
+
 
 
 @csrf_exempt
@@ -244,6 +269,32 @@ def add_discount(request, pk):
         order.update_totals()
         messages.info(request,"discount added...")
         return redirect(create_booking, pk = pk)
+    
+
+@login_required(login_url='signin')
+@csrf_exempt 
+def add_fine_to_order_item(request, pk):
+    order_item = get_object_or_404(OrderItem, id =pk)
+    if request.method == "POST":
+        fine =float(request.POST.get('fine'))
+        order_item.govt_fine = fine
+        order_item.save()
+        order_item.order.update_totals()
+        messages.info(request,"Fine added...")
+        return redirect(create_booking, pk = order_item.order.pk)
+    
+
+@login_required(login_url='signin')
+@csrf_exempt 
+def add_extras_to_order_item(request, pk):
+    order_item = get_object_or_404(OrderItem, id =pk)
+    if request.method == "POST":
+        fine =float(request.POST.get('extra'))
+        order_item.extra_amount = fine
+        order_item.save()
+        order_item.order.update_totals()
+        messages.info(request,"Extra amount added...")
+        return redirect(create_booking, pk = order_item.order.pk)
     
 
 @login_required(login_url='signin')
@@ -385,6 +436,7 @@ def add_client_to_service(request,pk):
         else:
             messages.error(request, "Form is invalid. Please correct the errors.")
             return redirect(create_booking, pk=order_item.order.id)
+
 
 
     

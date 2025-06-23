@@ -85,6 +85,14 @@
                                     <td><strong>{{ order.service_fee }}</strong></td>
                                 </tr>
                                 <tr>
+                                    <th>Govt Fine</th>
+                                    <td><strong>{{ order.total_fine }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Extra Amount</th>
+                                    <td><strong>{{ order.total_extra }}</strong></td>
+                                </tr>
+                                <tr>
                                     <th>Service Charge</th>
                                     <td><strong>{{ order.total_amount }}</strong></td>
                                 </tr>
@@ -250,6 +258,14 @@
                                                         <tr>
                                                             <td>Govt Fee</td>
                                                             <td>{{ item.service_fee }}</td>
+                                                        </tr>
+                                                         <tr>
+                                                            <td>Fine</td>
+                                                            <td>{{ item.govt_fine }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Extra Amount</td>
+                                                            <td>{{ item.extra_amount }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td>Total Tax</td>

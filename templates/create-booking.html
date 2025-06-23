@@ -578,6 +578,8 @@
                 success: function (response) {
                     if (response.success) {
                         $("#orderItemsTable").html(response.html);
+                        location.reload();
+
                     } else {
                         alert(response.error);
                     }
@@ -593,6 +595,7 @@
 
 
         });
+
         $(document).on('click', '.delete-item', function (e) {
             e.preventDefault();
             const button = $(this);
@@ -608,8 +611,9 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            alert(response.message);
                             $("#orderItemsTable").html(response.html);
+                            alert(response.message);
+                            location.reload();
                             // Optionally, remove the deleted item from the DOM
                             button.closest('tr').remove(); // Assuming the button is inside a table row
                         } else {

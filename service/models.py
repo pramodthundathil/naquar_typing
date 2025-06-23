@@ -117,6 +117,10 @@ class Order(models.Model):
     paid_amount = models.FloatField(default=0)
     balance_amount = models.FloatField(default=0)
 
+
+    total_fine = models.FloatField(default=0)
+    total_extra = models.FloatField(default=0)
+
     delivery_status = models.CharField(max_length=30, default="Not Delivered", choices= (
                                                                                             ("Not Delivered", "Not Delivered"),
                                                                                             ("Partially Delivered", "Partially Delivered"),
@@ -131,6 +135,9 @@ class Order(models.Model):
         total_tax = 0
         total_discount = 0
         total_amount = 0
+        total_fine = 0
+        total_extra = 0
+
 
         for item in self.orderitem_set.all():
             # Sum values from all related OrderItems
@@ -139,18 +146,23 @@ class Order(models.Model):
             total_amount_before_discount += item.total_price - item.discount
             total_tax += item.total_tax
             total_amount += item.total_price  # Total price includes discounts and tax
+            total_fine += item.govt_fine
+            total_extra += item.extra_amount
 
-        # Apply additional bill discount
-        total_discount += self.bill_discount
-        total_amount -= self.bill_discount
+        # Deduct 5% of discount from total tax when discount is applied
+        if self.bill_discount > 0:
+            tax_reduction = self.bill_discount * 0.05
+            total_tax -= tax_reduction
 
-        # Update order fields
+    # Update order fields
         self.total_amount_from_customer = total_amount_from_customer - self.bill_discount
         self.service_fee = service_fee
         self.total_amount_before_discount = total_amount_before_discount
         self.total_tax = total_tax
         self.total_amount = total_amount
         self.discount = total_discount
+        self.total_fine = total_fine
+        self.total_extra = total_extra
         self.save()
 
     def calculate_balance(self):
@@ -186,6 +198,11 @@ class OrderItem(models.Model):
     service_fee = models.FloatField(default=0)
     total_price = models.FloatField()  # Total price after discount and tax
     total_tax = models.FloatField()  # Total tax for the item
+
+    # extra fields added by customer request
+    govt_fine = models.FloatField(null=True, blank=True, default=0)
+    extra_amount = models.FloatField(null=True, blank=True, default=0)
+
     delivery_status = models.CharField(max_length=30, default="Not Delivered", choices= (
                                                                                             ("Not Delivered", "Not Delivered"),
                                                                                             ("Partially Delivered", "Partially Delivered"),
@@ -196,6 +213,11 @@ class OrderItem(models.Model):
 
     def save(self, *args, **kwargs):
         # self.total_price = self.total_tax - self.
+        self.price_from_customer = self.service.total_fund_from_customer
+        try:
+            self.price_from_customer = self.price_from_customer + self.govt_fine + self.extra_amount
+        except:
+            self.price_from_customer = self.price_from_customer
         try:
             self.service_title = self.service.title
         except:

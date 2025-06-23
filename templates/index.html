@@ -351,7 +351,7 @@
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link" href="{%url 'list_bookings' %}">List Bookings</a></li>
                 <li class="nav-item"> <a class="nav-link" href="{%url 'CreateOrder' %}">Book Service</a></li>
-                <li class="nav-item"> <a class="nav-link" href="{%url 'filter_booking' %}">Bookings View </a></li>
+                <li class="nav-item"> <a class="nav-link" href="{%url 'filter_booking' %}">Bookings Overview </a></li>
               </ul>
             </div>
           </li>
@@ -668,7 +668,8 @@
               <div class="card">
                 <div class="card-body">
                   <p class="card-title">Order Details</p>
-                  <p class="font-weight-500">The total number of orders and corresponding amounts during the date range reflect user order activity on your platform.</p>
+                  <p class="font-weight-500">The total number of orders and corresponding amounts during the date range
+                    reflect user order activity on your platform.</p>
                   <div class="d-flex flex-wrap mb-5">
                     <div class="mr-5 mt-3">
                       <p class="text-muted">Order value (This Week)</p>
@@ -1274,50 +1275,53 @@
                       <div class="table-responsive">
                         <table id="userTable" class="table table-striped table-borderless display expandable-table">
                           <thead class="bg-white text-uppercase">
-                              <tr class="ligth ligth-data">
-                                  <th>
-                                      <div class="checkbox d-inline-block">
-                                          <input type="checkbox" class="checkbox-input" id="checkbox1">
-                                          <label for="checkbox1" class="mb-0"></label>
-                                      </div>
-                                  </th>
-                                  <th>Customer Name</th>
-                                  <th>Invoice Number</th>
-                                  <th>Order Date</th>
-                                  <th>Total Amount</th>
-                                  <th>Paid Amount</th>
-                                  <th>Balance Amount</th>
-                                  <th>Payment Status</th>
-                                  <th>Actions</th>
-                              </tr>
+                            <tr class="ligth ligth-data">
+                              <th>
+                                <div class="checkbox d-inline-block">
+                                  <input type="checkbox" class="checkbox-input" id="checkbox1">
+                                  <label for="checkbox1" class="mb-0"></label>
+                                </div>
+                              </th>
+                              <th>Customer Name</th>
+                              <th>Invoice Number</th>
+                              <th>Order Date</th>
+                              <th>Total Amount</th>
+                              <th>Paid Amount</th>
+                              <th>Balance Amount</th>
+                              <th>Payment Status</th>
+                              <th>Actions</th>
+                            </tr>
                           </thead>
                           <tbody>
-                              {% for order in bookings %}
-                              <tr>
-                                  <td>
-                                      <div class="checkbox d-inline-block">
-                                          <input type="checkbox" class="checkbox-input" id="checkbox{{ order.id }}">
-                                          <label for="checkbox{{ order.id }}" class="mb-0"></label>
-                                      </div>
-                                  </td>
-                                  <td>{{ order.customer.name }}</td>
-                                  <td>{{ order.invoice_number }}</td>
-                                  <td>{{ order.order_date|date:"Y-m-d H:i" }}</td>
-                                  <td>{{ order.total_amount_from_customer }}</td>
-                                  <td>{{ order.paid_amount }}</td>
-                                  <td>{{ order.balance_amount }}</td>
-                                  <td>{{ order.payment_status1 }}</td>
-                                  <td>
-                                      <a href="{%url 'edit_order_booking' order.id %}" class="btn btn-dark"><i class="bi bi-pencil-square"></i></a>
-                                      <a href="{% url 'create_booking' order.id %}" class="btn btn-info"><i class="bi bi-receipt-cutoff"></i> Bill</a>
-                                      <a href="{% url 'delete_order' order.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete?')">
-                                          <i class="bi bi-trash3"></i>
-                                      </a>
-                                  </td>
-                              </tr>
-                              {% endfor %}
+                            {% for order in bookings %}
+                            <tr>
+                              <td>
+                                <div class="checkbox d-inline-block">
+                                  <input type="checkbox" class="checkbox-input" id="checkbox{{ order.id }}">
+                                  <label for="checkbox{{ order.id }}" class="mb-0"></label>
+                                </div>
+                              </td>
+                              <td>{{ order.customer.name }}</td>
+                              <td>{{ order.invoice_number }}</td>
+                              <td>{{ order.order_date|date:"Y-m-d H:i" }}</td>
+                              <td>{{ order.total_amount_from_customer }}</td>
+                              <td>{{ order.paid_amount }}</td>
+                              <td>{{ order.balance_amount }}</td>
+                              <td>{{ order.payment_status1 }}</td>
+                              <td>
+                                <a href="{%url 'edit_order_booking' order.id %}" class="btn btn-dark"><i
+                                    class="bi bi-pencil-square"></i></a>
+                                <a href="{% url 'create_booking' order.id %}" class="btn btn-info"><i
+                                    class="bi bi-receipt-cutoff"></i> Bill</a>
+                                <a href="{% url 'delete_order' order.id %}" class="btn btn-danger"
+                                  onclick="return confirm('Are you sure you want to delete?')">
+                                  <i class="bi bi-trash3"></i>
+                                </a>
+                              </td>
+                            </tr>
+                            {% endfor %}
                           </tbody>
-                      </table>
+                        </table>
                       </div>
                     </div>
                   </div>
@@ -1510,121 +1514,121 @@
 
   </script>
 
-<!-- charts  -->
+  <!-- charts  -->
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('order-chart1').getContext('2d');
+      const ctx = document.getElementById('order-chart1').getContext('2d');
 
-        fetch('{%url "weekly_order_chart_data" %}')
-            .then(response => response.json())
-            .then(data => {
-                const chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [
-                            {
-                                label: 'This Week',
-                                data: data.this_week_data,
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                fill: true,
-                            },
-                            {
-                                label: 'Last Week',
-                                data: data.last_week_data,
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                fill: true,
-                            },
-                        ],
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                        },
-                        scales: {
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Order Amount',
-                                },
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Weekday',
-                                },
-                            },
-                        },
-                    },
-                });
-            })
-            .catch(error => console.error('Error fetching data:', error));
+      fetch('{%url "weekly_order_chart_data" %}')
+        .then(response => response.json())
+        .then(data => {
+          const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: data.labels,
+              datasets: [
+                {
+                  label: 'This Week',
+                  data: data.this_week_data,
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  fill: true,
+                },
+                {
+                  label: 'Last Week',
+                  data: data.last_week_data,
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  fill: true,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+              },
+              scales: {
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Order Amount',
+                  },
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Weekday',
+                  },
+                },
+              },
+            },
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
     });
 
 
     document.addEventListener("DOMContentLoaded", function () {
-        const ctx = document.getElementById('income-expense-chart').getContext('2d');
+      const ctx = document.getElementById('income-expense-chart').getContext('2d');
 
-        // Fetch data from the backend
-        fetch('{%url "income_expense_chart_json" %}')
-            .then(response => response.json())
-            .then(data => {
-                const chart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.weekdays, // Weekdays from JSON response
-                        datasets: [
-                            {
-                                label: 'Income',
-                                data: data.income_data, // Income data from JSON response
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderWidth: 1,
-                            },
-                            {
-                                label: 'Expense',
-                                data: data.expense_data, // Expense data from JSON response
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderWidth: 1,
-                            },
-                        ],
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Amount',
-                                },
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Weekdays',
-                                },
-                            },
-                        },
-                    },
-                });
-            })
-            .catch(error => console.error('Error fetching data:', error));
+      // Fetch data from the backend
+      fetch('{%url "income_expense_chart_json" %}')
+        .then(response => response.json())
+        .then(data => {
+          const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.weekdays, // Weekdays from JSON response
+              datasets: [
+                {
+                  label: 'Income',
+                  data: data.income_data, // Income data from JSON response
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderWidth: 1,
+                },
+                {
+                  label: 'Expense',
+                  data: data.expense_data, // Expense data from JSON response
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Amount',
+                  },
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Weekdays',
+                  },
+                },
+              },
+            },
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
     });
-</script>
+  </script>
 
 
 
