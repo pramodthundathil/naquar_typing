@@ -366,7 +366,7 @@ def voucher(request, pk):
     order = get_object_or_404(Order, id=pk)
     
     # Generate the QR code URL
-    qr_url = request.build_absolute_uri(f"/services/create_booking/{order.id}/")
+    qr_url = request.build_absolute_uri(f"/services/create_booking/{order.id}")
 
     # Generate the QR code
     qr = qrcode.QRCode(
