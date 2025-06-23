@@ -65,17 +65,19 @@
                 </div>
 
             </td>
+            {% if request.user.role == "user" %}
             <td>
-                <input type="number" value="{{ item.total_price |floatformat:2 }}" name="unit_price" id="unit_price"
-                    class="form-control" readonly>
-                    <div class="row mt-2">
+                <!-- <input type="number" value="{{ item.total_price |floatformat:2 }}" name="unit_price" id="unit_price"
+                    class="form-control" readonly> -->
+                <div class="row mt-2">
                     <div class="col-8">
-                        <span class="text-dark font-sm">Fine amount: <span class="text-danger">{{ item.govt_fine}}</span></span>
+                        <span class="text-dark font-sm">Fine amount: <span class="text-danger">{{item.govt_fine}}</span></span>
                     </div>
-                    <div class="col-4"><button data-bs-toggle="modal" data-bs-target="#fine-add-{{item.id}}" class="btn btn-sm btn-outline-warning"> Add Fine</button></div>
+                    <div class="col-4"><button data-bs-toggle="modal" data-bs-target="#fine-add-{{item.id}}"
+                            class="btn btn-sm btn-outline-warning"> Add Fine</button></div>
                 </div>
 
-                 <!-- Modal for fine  -->
+                <!-- Modal for fine  -->
                 <div class="modal fade" id="fine-add-{{item.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
@@ -88,7 +90,95 @@
                             <div class="modal-body">
                                 <form action="{%url 'add_fine_to_order_item' item.id %}" method="post">
                                     {% csrf_token %}
-                                    <input type="number" class="form-control" name="fine" required placeholder="Fine On Service">
+                                    <input type="number" class="form-control" name="fine" required
+                                        placeholder="Fine On Service">
+
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Add Fine</button>
+                                </form>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </td>
+            <td>
+                <!-- <input type="number" value="{{ item.service_fee }}" name="quantity" class="form-control" readonly> -->
+                <div class="row mt-2">
+                    <div class="col-8">
+                        <span class="text-dark font-sm">Extra amount: <span class="text-warning">{{item.extra_amount}}</span></span>
+                    </div>
+                    <div class="col-4"><button data-bs-toggle="modal" data-bs-target="#extra-add-{{item.id}}"
+                            class="btn btn-sm btn-outline-warning"> Add Extra</button></div>
+                </div>
+
+                <!-- Modal for Extra amount  -->
+                <div class="modal fade" id="extra-add-{{item.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">
+                                    Add Extra Amount To Service</h5>
+                                <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">x</button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{%url 'add_extras_to_order_item' item.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="number" class="form-control" name="extra" required
+                                        placeholder="Extra Amount for Service">
+
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Add Extra Amount</button>
+                                </form>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>
+            <td>{{ item.price_from_customer |floatformat:2 }}</td>
+            <td>
+                <button class="btn btn-sm btn-primary delete-item" data-item-id="{{ item.id }}">Delete</button>
+                <!-- <button class="btn btn-sm btn-secondary decrease-quantity" data-item-id="{{ item.id }}">-</button> -->
+            </td>
+            {% else %}
+            <td>
+                <input type="number" value="{{ item.total_price |floatformat:2 }}" name="unit_price" id="unit_price"
+                    class="form-control" readonly>
+                <div class="row mt-2">
+                    <div class="col-8">
+                        <span class="text-dark font-sm">Fine amount: <span class="text-danger">{{item.govt_fine}}</span></span>
+                    </div>
+                    <div class="col-4"><button data-bs-toggle="modal" data-bs-target="#fine-add-{{item.id}}"
+                            class="btn btn-sm btn-outline-warning"> Add Fine</button></div>
+                </div>
+
+                <!-- Modal for fine  -->
+                <div class="modal fade" id="fine-add-{{item.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">
+                                    Add Fine To Service</h5>
+                                <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close">x</button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{%url 'add_fine_to_order_item' item.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="number" class="form-control" name="fine" required
+                                        placeholder="Fine On Service">
 
                                     <br>
                                     <button type="submit" class="btn btn-primary">Add Fine</button>
@@ -108,12 +198,13 @@
                 <input type="number" value="{{ item.service_fee }}" name="quantity" class="form-control" readonly>
                 <div class="row mt-2">
                     <div class="col-8">
-                        <span class="text-dark font-sm">Extra amount: <span class="text-warning">{{ item.extra_amount}}</span></span>
+                        <span class="text-dark font-sm">Extra amount: <span class="text-warning">{{item.extra_amount}}</span></span>
                     </div>
-                    <div class="col-4"><button data-bs-toggle="modal" data-bs-target="#extra-add-{{item.id}}" class="btn btn-sm btn-outline-warning"> Add Extra</button></div>
+                    <div class="col-4"><button data-bs-toggle="modal" data-bs-target="#extra-add-{{item.id}}"
+                            class="btn btn-sm btn-outline-warning"> Add Extra</button></div>
                 </div>
 
-                 <!-- Modal for Extra amount  -->
+                <!-- Modal for Extra amount  -->
                 <div class="modal fade" id="extra-add-{{item.id}}" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
@@ -126,7 +217,8 @@
                             <div class="modal-body">
                                 <form action="{%url 'add_extras_to_order_item' item.id %}" method="post">
                                     {% csrf_token %}
-                                    <input type="number" class="form-control" name="extra" required placeholder="Extra Amount for Service">
+                                    <input type="number" class="form-control" name="extra" required
+                                        placeholder="Extra Amount for Service">
 
                                     <br>
                                     <button type="submit" class="btn btn-primary">Add Extra Amount</button>
@@ -148,6 +240,7 @@
                 <button class="btn btn-sm btn-primary delete-item" data-item-id="{{ item.id }}">Delete</button>
                 <!-- <button class="btn btn-sm btn-secondary decrease-quantity" data-item-id="{{ item.id }}">-</button> -->
             </td>
+            {% endif %}
         </tr>
         {% endfor %}
         <tr>

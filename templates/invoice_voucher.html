@@ -172,16 +172,16 @@
                 <tr>
                     <th>Sl No</th>
                     <th>Service</th>
-                    <th>Discount</th>
-                    <th>Tax</th>
+                    <th>Fine</th>
+                    <th>Extra Amount</th>
                     <th>Total Price</th>
                 </tr>
                 {% for item in order.orderitem_set.all %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ item.service }}</td>
-                    <td>{{item.discount|floatformat:2 }}</td>
-                    <td>{{ item.total_tax|floatformat:2 }}</td>
+                    <td>{{item.govt_fine|floatformat:2 }}</td>
+                    <td>{{ item.extra_amount|floatformat:2 }}</td>
                     <td>{{ item.price_from_customer|floatformat:2 }}</td>
                 </tr>
                 {% endfor %}
@@ -195,9 +195,15 @@
                 <h6>{{ total_in_words }}</h6>
             </div>
             <div class="amount-details">
-                <p><strong>Total Amount:</strong> {{ order.total_amount|floatformat:2 }}</p>
+                {% if order.total_fine > 0 %}
+                <p><strong>Fine:</strong> {{ order.total_fine|floatformat:2 }}</p>
+                {% endif %}
+                {% if order.total_extra > 0 %}
+                <p><strong>Extra Amount:</strong> {{ order.total_extra|floatformat:2 }}</p>
+                {% endif %}
+                <!-- <p><strong>Total Amount:</strong> {{ order.total_amount|floatformat:2 }}</p>
                 <p><strong>Discount:</strong> {{ order.discount|floatformat:2 }}</p>
-                <p><strong>Tax:</strong> {{ order.total_tax|floatformat:2 }}</p>
+                <p><strong>Tax:</strong> {{ order.total_tax|floatformat:2 }}</p> -->
                 <p><strong>Net Amount:</strong> 
                     {{ order.total_amount_from_customer|floatformat:2 }}</p>
             </div>
