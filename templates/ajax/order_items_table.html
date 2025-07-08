@@ -21,11 +21,18 @@
     <table class="table table-striped mt-3" style="width: 100% !important;">
         <tr class="head-tr-class">
             <th>Service</th>
+            {% if request.user.role == "user" %}
+            <th></th>
+            <th></th>
+            <th></th>
+            {% else %}
             <th>Service Charge</th>
             <th>Govt. Charge</th>
             <th>Tax</th>
+            {% endif %}
             <th>Total</th>
             <th>Actions</th>
+            
         </tr>
         {% for item in order.orderitem_set.all %}
         <tr>
