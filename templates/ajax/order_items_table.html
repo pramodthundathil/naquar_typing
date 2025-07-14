@@ -253,6 +253,9 @@
         <tr>
             <th colspan="5"></th>
         </tr>
+        {% if request.user.role == "user" %}
+
+        {% else %}
         <tr>
             <td colspan="3" class="text-center bg-info-light">Net Total </td>
             <td>inclusive of tax ({{order.total_tax|floatformat:2 }})</td>
@@ -276,6 +279,8 @@
             </td>
             <!-- <th class="bg-info-light"></th> -->
         </tr>
+        {% endif %}
+
 
         <tr>
             <th colspan="4" class="text-center bg-info-light">Grand Total</th>
