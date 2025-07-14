@@ -232,9 +232,9 @@
                 {% if order.total_fine > 0 %}
                 <p><strong>Fine:</strong> {{ order.total_fine|floatformat:2 }}</p>
                 {% endif %}
-                {% if order.total_extra > 0 %}
+                <!-- {% if order.total_extra > 0 %}
                 <p><strong>Extra Amount:</strong> {{ order.total_extra|floatformat:2 }}</p>
-                {% endif %}
+                {% endif %} -->
                 <p><strong>Net Amount:</strong> 
                     {{ order.total_amount_from_customer|floatformat:2 }}</p>
             </div>
