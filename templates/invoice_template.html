@@ -195,13 +195,14 @@
             </div>
             <div class="amount-details">
                 <p><strong>Total Amount:</strong> {{ order.total_amount|floatformat:2 }}</p>
-                <p><strong>Govt Fee:</strong> {{ order.service_fee|floatformat:2 }}</p>
+                <p><strong>Govt Fee:</strong> {{ g_fee|floatformat:2 }}</p>
+                <!-- <p><strong>Govt Fee:</strong> {{ order.service_fee|floatformat:2 }}</p>g-fee -->
                 {% if order.total_fine > 0 %}
                 <p><strong>Fine:</strong> {{ order.total_fine|floatformat:2 }}</p>
                 {% endif %}
-                {% if order.total_extra > 0 %}
+                <!-- {% if order.total_extra > 0 %}
                 <p><strong>Extra Amount:</strong> {{ order.total_extra|floatformat:2 }}</p>
-                {% endif %}
+                {% endif %} -->
                 <p><strong>Discount:</strong> {{ order.discount|floatformat:2 }}</p>
                 <p><strong>Tax:</strong> {{ order.total_tax|floatformat:2 }}</p>
                 <p><strong>Net Amount:</strong>

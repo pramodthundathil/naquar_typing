@@ -349,7 +349,8 @@ def invoice(request,pk):
 
     context = {
         "order":order,
-        "total_in_words": amount_in_words(round(order.total_amount_from_customer,2))
+        "total_in_words": amount_in_words(round(order.total_amount_from_customer,2)),
+        'g_fee': float(order.total_extra) + float(order.service_fee) 
     }
     return render(request, 'invoice_template.html',context )
 

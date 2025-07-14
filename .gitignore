@@ -4,6 +4,8 @@ db.sqlite3
 # Ignore media files (uploaded images, documents, etc.)
 media/
 
+newstatic/
+
 # Ignore Python cache files
 __pycache__/
 *.pyc
